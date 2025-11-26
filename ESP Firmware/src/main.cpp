@@ -6,10 +6,14 @@
    It requires the use of SoftwareSerial, and assumes that you have a
    4800-baud serial GPS device hooked up on pins 4(rx) and 3(tx).
 */
-static const int RXPin = 3, TXPin = 1;
+static const int RXPin = 18, TXPin = 19;
 static const uint32_t GPSBaud = 9600;
 
 // The TinyGPSPlus object
+// Uncomment the following line to enable raw GPS NMEA logging to the USB/Serial console
+// or define GPS_DEBUG_RAW in platformio.ini build_flags if you prefer.
+#define GPS_DEBUG_RAW 1
+
 TinyGPSPlus gps;
 
 // The serial connection to the GPS device
@@ -81,9 +85,25 @@ void setup()
 void loop()
 {
   // This sketch displays information every time a new sentence is correctly encoded.
+  // Also optionally prints raw NMEA sentences from the GPS to the USB Serial (for debugging).
   while (ss.available() > 0)
-    if (gps.encode(ss.read()))
+  {
+    char c = ss.read();
+    static String rawLine = "";
+    // Build a line buffer and print it when a newline is received
+    if (c != '\r')
+    {
+      rawLine += c;
+      if (c == '\n')
+      {
+        Serial.print(F("GPS RAW: "));
+        Serial.print(rawLine);
+        rawLine = "";
+      }
+    }
+    if (gps.encode(c))
       displayInfo();
+  }
 
   if (millis() > 5000 && gps.charsProcessed() < 10)
   {
