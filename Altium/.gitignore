@@ -1,0 +1,15 @@
+
+*.SchDocPreview
+*/History/**
+**/__Previews/**
+**/Project Logs for */**
+**/Project Outputs for */**
+
+**/History/**
+*.htm
+*.pdf
+
+Beacon/buzzer circuit.op.raw
+
+Beacon/buzzer circuit.log
+PSat/Beacon/Fabrication Files/*
