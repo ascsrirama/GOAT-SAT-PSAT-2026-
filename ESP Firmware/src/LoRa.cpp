@@ -1,3 +1,5 @@
+#include "LoRa.h"
+
 /** =========================================================================
  * @example{lineno} AllFunctions.ino
  * @author Sara Damiano <sdamiano@stroudcenter.org>
@@ -14,7 +16,7 @@
  * ======================================================================= */
 
 // Select your modem:
- #define LORA_AT_MDOT
+// #define LORA_AT_MDOT
 // #define LORA_AT_WIOE5
 
 // Set serial for debug console (to the Serial Monitor, default speed 115200)
@@ -27,7 +29,7 @@
 
 // or Software Serial on Uno, Nano
 //#else
-#include <SoftwareSerial.h>
+//#include <SoftwareSerial.h>
 SoftwareSerial SerialAT(16, 17);  // RX, TX
 //#endif
 
@@ -95,7 +97,7 @@ int8_t lora_wake_pullup = 1;
 int8_t lora_wake_edge = 0;
 
 
-#include <LoRa_AT.h>
+//#include <LoRa_AT.h>
 
 #if LORA_AT_TEST_ABP
 #undef LORA_AT_TEST_OTAA
@@ -116,7 +118,7 @@ LoRa_AT modem(SerialAT);
 
 LoRaStream loraStream(modem);
 
-void setup() {
+void setupLoRa() {
   // Set console baud rate
   SerialMon.begin(115200);
   delay(10);
@@ -152,7 +154,7 @@ void setup() {
   SerialAT.begin(9600);
 }
 
-void loop() {
+void loopLoRa() {
   // Restart takes quite some time
   // To skip it, call init() instead of restart()
   SerialMon.println(F("Initializing modem..."));
