@@ -1,4 +1,6 @@
 #include "LoRa.h"
+#include <SoftwareSerial.h>
+#include <LoRa_AT.h>
 
 
 /** =========================================================================

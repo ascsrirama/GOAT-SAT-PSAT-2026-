@@ -1,4 +1,6 @@
 #include "gps.h"
+#include <TinyGPSPlus.h>
+#include <SoftwareSerial.h>
 
 /*
    This sample sketch demonstrates the normal use of a TinyGPSPlus (TinyGPSPlus) object.

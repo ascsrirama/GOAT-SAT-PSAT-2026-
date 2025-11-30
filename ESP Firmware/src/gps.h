@@ -1,6 +1,6 @@
 #pragma once
-#include <TinyGPSPlus.h>
-#include <SoftwareSerial.h>
+// #include <TinyGPSPlus.h>
+// #include <SoftwareSerial.h>
 
 void setupGPS();
 void readGPSData();

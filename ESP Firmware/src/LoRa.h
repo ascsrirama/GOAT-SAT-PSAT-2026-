@@ -1,6 +1,8 @@
 #pragma once
-#include <SoftwareSerial.h>
-#include <LoRa_AT.h>
+// put library
+#define LORA_AT_WIOE5
+// #include <SoftwareSerial.h>
+// #include <LoRa_AT.h>
 
 void setupLoRa();
 void loopLoRa();
