@@ -274,7 +274,7 @@ import collections
 # -----------------------------
 # Serial setup
 # -----------------------------
-SERIAL_PORT = "COM15"  # Replace with your ESP32 COM port
+SERIAL_PORT = "COM7"  # Replace with your ESP32 COM port
 BAUD_RATE = 115200
 
 ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1)
