@@ -8,7 +8,7 @@
 // (change to what we are using)
 static const int LORA_RX_PIN = 16;       // ESP32 RX2  <- LoRa TX
 static const int LORA_TX_PIN = 17;       // ESP32 TX2  -> LoRa RX
-static const uint32_t LORA_BAUD = 9600;  // adjust if your module uses different
+static const uint32_t LORA_BAUD = 115200;  
 
 // Use hardware UART2 on ESP32
 HardwareSerial LoRaSerial(2);

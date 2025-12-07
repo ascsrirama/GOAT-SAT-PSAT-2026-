@@ -1,5 +1,5 @@
 #include "gps.h"
-#include "LoRa.h"            // ⬅️ NEW: for sendLoRaLine
+#include "LoRa.h"           
 #include <TinyGPSPlus.h>
 #include <SoftwareSerial.h>
 
