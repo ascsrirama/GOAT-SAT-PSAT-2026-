@@ -7,4 +7,5 @@
 
 void setupLoRa();
 void loopLoRa();
-void sendLoRaLine(const char* line);
+//void sendLoRaLine(const char* line);
+void sendLoRaLine(const String& line);
