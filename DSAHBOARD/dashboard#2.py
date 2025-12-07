@@ -262,22 +262,145 @@
 # root.mainloop()
 
 
+# import customtkinter
+# import tkintermapview
+# import tkinter as tk
+# import serial
+# import threading
+# from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+# from matplotlib.figure import Figure
+# import collections
+
+# # -----------------------------
+# # Serial setup
+# # -----------------------------
+# SERIAL_PORT = "COM7"  # Replace with your ESP32 COM port
+# BAUD_RATE = 115200
+
+# ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1)
+
+# # -----------------------------
+# # GUI setup
+# # -----------------------------
+# customtkinter.set_appearance_mode("system")
+# customtkinter.set_default_color_theme("blue")
+
+# root = customtkinter.CTk()
+# root.title("ESP32 Dashboard")
+# root.geometry("1200x800")
+
+# # Layout: 2 columns, left for charts, right for map
+# root.grid_rowconfigure(0, weight=1)
+# root.grid_columnconfigure(0, weight=1)  # charts
+# root.grid_columnconfigure(1, weight=2)  # map
+
+# # -----------------------------
+# # Charts frame (left)
+# # -----------------------------
+# charts_frame = customtkinter.CTkFrame(root)
+# charts_frame.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
+# charts_frame.grid_rowconfigure(0, weight=1)
+# charts_frame.grid_rowconfigure(1, weight=1)
+# charts_frame.grid_columnconfigure(0, weight=1)
+
+# # Accelerometer chart
+# fig_acc = Figure(figsize=(5, 3), dpi=100)
+# ax_acc = fig_acc.add_subplot(111)
+# ax_acc.set_title("Accelerometer")
+# ax_acc.set_ylim(-10, 10)
+# ax_acc.set_ylabel("m/s²")
+# ax_acc.set_xlabel("Time")
+# acc_data = collections.deque(maxlen=50)
+# line_acc, = ax_acc.plot([], [], color='blue')
+# canvas_acc = FigureCanvasTkAgg(fig_acc, master=charts_frame)
+# canvas_acc.get_tk_widget().grid(row=0, column=0, sticky="nsew", padx=5, pady=5)
+
+# # Altimeter chart
+# fig_alt = Figure(figsize=(5, 3), dpi=100)
+# ax_alt = fig_alt.add_subplot(111)
+# ax_alt.set_title("Altimeter")
+# ax_alt.set_ylim(0, 500)
+# ax_alt.set_ylabel("m")
+# ax_alt.set_xlabel("Time")
+# alt_data = collections.deque(maxlen=50)
+# line_alt, = ax_alt.plot([], [], color='green')
+# canvas_alt = FigureCanvasTkAgg(fig_alt, master=charts_frame)
+# canvas_alt.get_tk_widget().grid(row=1, column=0, sticky="nsew", padx=5, pady=5)
+
+# # -----------------------------
+# # Map frame (right)
+# # -----------------------------
+# map_frame = customtkinter.CTkFrame(root)
+# map_frame.grid(row=0, column=1, sticky="nsew", padx=10, pady=10)
+# map_widget = tkintermapview.TkinterMapView(map_frame, width=800, height=800, corner_radius=0)
+# map_widget.pack(fill="both", expand=True)
+# map_widget.set_zoom(17)
+# marker = None
+
+# def update_marker(lat, lon):
+#     global marker
+#     map_widget.set_position(lat, lon)
+#     if marker:
+#         marker.set_position(lat, lon)
+#     else:
+#         marker = map_widget.set_marker(lat, lon, text="ESP32 Location")
+
+# # -----------------------------
+# # Serial reading thread
+# # -----------------------------
+# def read_serial():
+#     while True:
+#         try:
+#             line = ser.readline().decode().strip()
+#             if line:
+#                 # Expecting: LAT,LON,ACC,ALT
+#                 parts = line.split(",")
+#                 if len(parts) == 4:
+#                     lat, lon = float(parts[0]), float(parts[1])
+#                     acc_val, alt_val = float(parts[2]), float(parts[3])
+
+#                     # Update GUI safely
+#                     root.after(0, update_marker, lat, lon)
+
+#                     # Update charts
+#                     acc_data.append(acc_val)
+#                     alt_data.append(alt_val)
+
+#                     line_acc.set_data(range(len(acc_data)), acc_data)
+#                     ax_acc.set_xlim(0, max(50, len(acc_data)))
+#                     canvas_acc.draw()
+
+#                     line_alt.set_data(range(len(alt_data)), alt_data)
+#                     ax_alt.set_xlim(0, max(50, len(alt_data)))
+#                     canvas_alt.draw()
+#         except Exception as e:
+#             print("Error reading serial:", e)
+
+# threading.Thread(target=read_serial, daemon=True).start()
+
+# root.mainloop()
+
+
+
+
 import customtkinter
 import tkintermapview
 import tkinter as tk
-import serial
+# import serial   # <- NOT NEEDED for fake ESP
 import threading
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 import collections
+import random
+import time
+import math
 
 # -----------------------------
-# Serial setup
+# FAKE ESP setup (no serial)
 # -----------------------------
-SERIAL_PORT = "COM7"  # Replace with your ESP32 COM port
-BAUD_RATE = 115200
-
-ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1)
+# SERIAL_PORT = "COM7"  # Not used now
+# BAUD_RATE = 115200
+# ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1)
 
 # -----------------------------
 # GUI setup
@@ -286,7 +409,7 @@ customtkinter.set_appearance_mode("system")
 customtkinter.set_default_color_theme("blue")
 
 root = customtkinter.CTk()
-root.title("ESP32 Dashboard")
+root.title("ESP32 Dashboard - FAKE ESP MODE")
 root.geometry("1200x800")
 
 # Layout: 2 columns, left for charts, right for map
@@ -346,36 +469,51 @@ def update_marker(lat, lon):
         marker = map_widget.set_marker(lat, lon, text="ESP32 Location")
 
 # -----------------------------
-# Serial reading thread
+# GUI update helper
 # -----------------------------
-def read_serial():
+def update_gui(lat, lon, acc_val, alt_val):
+    # Map
+    update_marker(lat, lon)
+
+    # Accelerometer
+    acc_data.append(acc_val)
+    line_acc.set_data(range(len(acc_data)), acc_data)
+    ax_acc.set_xlim(0, max(50, len(acc_data)))
+    canvas_acc.draw()
+
+    # Altimeter
+    alt_data.append(alt_val)
+    line_alt.set_data(range(len(alt_data)), alt_data)
+    ax_alt.set_xlim(0, max(50, len(alt_data)))
+    canvas_alt.draw()
+
+# -----------------------------
+# Fake ESP data thread
+# -----------------------------
+def fake_esp():
+    base_lat = -36.8485   # Auckland-ish
+    base_lon = 174.7633
+    radius = 0.001        # ~small circle on map
+    t = 0
+
     while True:
-        try:
-            line = ser.readline().decode().strip()
-            if line:
-                # Expecting: LAT,LON,ACC,ALT
-                parts = line.split(",")
-                if len(parts) == 4:
-                    lat, lon = float(parts[0]), float(parts[1])
-                    acc_val, alt_val = float(parts[2]), float(parts[3])
+        # Smooth circular GPS motion
+        lat = base_lat + radius * math.sin(t / 100.0)
+        lon = base_lon + radius * math.cos(t / 100.0)
 
-                    # Update GUI safely
-                    root.after(0, update_marker, lat, lon)
+        # Smooth accelerometer signal
+        acc_val = 5 * math.sin(t / 20.0)
 
-                    # Update charts
-                    acc_data.append(acc_val)
-                    alt_data.append(alt_val)
+        # Smooth altitude wave between ~100 and ~400 m
+        alt_val = 250 + 150 * math.sin(t / 60.0)
 
-                    line_acc.set_data(range(len(acc_data)), acc_data)
-                    ax_acc.set_xlim(0, max(50, len(acc_data)))
-                    canvas_acc.draw()
+        # Schedule GUI update on main thread
+        root.after(0, update_gui, lat, lon, acc_val, alt_val)
 
-                    line_alt.set_data(range(len(alt_data)), alt_data)
-                    ax_alt.set_xlim(0, max(50, len(alt_data)))
-                    canvas_alt.draw()
-        except Exception as e:
-            print("Error reading serial:", e)
+        t += 1
+        time.sleep(0.1)  # 10 updates per second
 
-threading.Thread(target=read_serial, daemon=True).start()
+# Start fake ESP thread
+threading.Thread(target=fake_esp, daemon=True).start()
 
 root.mainloop()

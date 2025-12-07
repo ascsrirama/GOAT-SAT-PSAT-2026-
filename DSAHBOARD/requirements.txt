@@ -1,0 +1,8 @@
+kivy
+kivy-garden
+kivy-garden.mapview
+kivy-garden.matplotlib
+matplotlib
+pyserial
+customtkinter
+tkintermapview
