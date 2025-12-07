@@ -200,7 +200,7 @@ ClassGenCCAutoRoomEnabled=1
 ClassGenNCAutoScope=None
 DItemRevisionGUID=
 GenerateClassCluster=0
-DocumentUniqueId=
+DocumentUniqueId=DEAGUHCG
 
 [Document10]
 DocumentPath=Libraries\SSQ-104-02-S-S\Imported SSQ-104-02-S-S.lia\SSQ-104-02-S-S.SchLib
@@ -305,7 +305,7 @@ GenerateClassCluster=0
 DocumentUniqueId=
 
 [Document16]
-DocumentPath=..\..\..\..\..\..\Downloads\0532610871.IntLib
+DocumentPath=..\..\..\..\..\..\Downloads\MS5611-01BA03.IntLib
 AnnotationEnabled=1
 AnnotateStartValue=1
 AnnotationIndexControlEnabled=0
@@ -322,6 +322,23 @@ GenerateClassCluster=0
 DocumentUniqueId=
 
 [Document17]
+DocumentPath=..\..\..\..\..\..\Downloads\0532610871.IntLib
+AnnotationEnabled=1
+AnnotateStartValue=1
+AnnotationIndexControlEnabled=0
+AnnotateSuffix=
+AnnotateScope=All
+AnnotateOrder=-1
+DoLibraryUpdate=1
+DoDatabaseUpdate=1
+ClassGenCCAutoEnabled=1
+ClassGenCCAutoRoomEnabled=0
+ClassGenNCAutoScope=None
+DItemRevisionGUID=
+GenerateClassCluster=0
+DocumentUniqueId=
+
+[Document18]
 DocumentPath=..\..\..\..\..\..\Downloads\SSQ-105-03-S-S.IntLib
 AnnotationEnabled=1
 AnnotateStartValue=1
