@@ -22,7 +22,7 @@ print("GOAT-SAT dashboard starting...")
 # ============================
 #  SERIAL CONFIG – WINDOWS
 # ============================
-SERIAL_PORT = "COM22"   # <-- LoRa RX board on Windows
+SERIAL_PORT = "COM21"   # <-- LoRa RX board on Windows
 SERIAL_BAUD = 115200
 
 
@@ -33,7 +33,8 @@ SERIAL_BAUD = 115200
 class SerialReader(threading.Thread):
     """
     Reads lines from COM22 and pushes them into a queue.
-    Expects lines like: LAT=-36.606753,LON=174.666452
+    Expects lines that contain: LAT=...,LON=...
+    e.g. 'RX Got 29 bytes (RSSI=-27, SNR=13): LAT=-36.853185,LON=174.769157'
     """
 
     def __init__(self, port, baudrate, line_queue):
@@ -115,6 +116,10 @@ class Dashboard(DarkPanel):
         self.serial_last_fix_ts = 0.0
         self.current_lat = None
         self.current_lon = None
+
+        # rolling history for smoothing
+        self.lat_history = collections.deque(maxlen=10)
+        self.lon_history = collections.deque(maxlen=10)
 
         # -----------------------------
         # TOP: MISSION HEADER
@@ -271,6 +276,7 @@ class Dashboard(DarkPanel):
         #   MAP + INFO (RIGHT)
         # =============================
 
+        # Initial fake base (Auckland-ish)
         self.base_lat = -36.8485
         self.base_lon = 174.7633
         self.radius = 0.001
@@ -356,22 +362,37 @@ class Dashboard(DarkPanel):
         Pull all pending lines from the serial queue
         and update self.current_lat / self.current_lon
         when we see 'LAT=...,LON=...'.
+        Handles lines like:
+          'RX Got 29 bytes (RSSI=-27, SNR=13): LAT=-36.853185,LON=174.769157'
         """
         updated = False
         while not self.serial_queue.empty():
             line = self.serial_queue.get_nowait()
-            # Expect lines like: LAT=-36.606753,LON=174.666452
-            if line.startswith("LAT="):
+            # Debug so you can see what actually comes from COM22
+            print("[RX LINE]", repr(line))
+
+            if "LAT=" in line and "LON=" in line:
                 try:
-                    parts = line.split(",")
+                    sub = line[line.index("LAT="):]  # keep from 'LAT=' onward
+                    parts = sub.split(",")
+
                     lat_str = parts[0].split("=", 1)[1]
                     lon_str = parts[1].split("=", 1)[1]
+
                     lat = float(lat_str)
                     lon = float(lon_str)
+
+                    # raw latest fix
                     self.current_lat = lat
                     self.current_lon = lon
                     self.serial_last_fix_ts = time.time()
+
+                    # also feed history for smoothing
+                    self.lat_history.append(lat)
+                    self.lon_history.append(lon)
+
                     updated = True
+                    print(f"[GPS PARSED] lat={lat}, lon={lon}")
                 except Exception as e:
                     print(f"[Dashboard] Failed to parse GPS line '{line}': {e}")
         return updated
@@ -385,10 +406,14 @@ class Dashboard(DarkPanel):
         has_new_gps = self._consume_serial()
 
         # 2) Decide what lat/lon to display
-        if self.current_lat is not None and self.current_lon is not None:
-            # Use real GPS from LoRa RX
-            lat = self.current_lat
-            lon = self.current_lon
+        if (
+            self.current_lat is not None
+            and self.current_lon is not None
+            and len(self.lat_history) > 0
+        ):
+            # Use smoothed GPS (average of last few fixes)
+            lat = sum(self.lat_history) / len(self.lat_history)
+            lon = sum(self.lon_history) / len(self.lon_history)
             self.status_label.text = "[b]LORA RX: ONLINE[/b]"
         else:
             # Fallback to simple circular simulation
@@ -401,6 +426,7 @@ class Dashboard(DarkPanel):
         alt_val = 250 + 150 * math.sin(self.t / 60.0)
 
         # --- Update map ---
+        # If you want the map not to recenter every frame, comment next line
         self.map_view.center_on(lat, lon)
         self.marker.lat = lat
         self.marker.lon = lon
@@ -418,8 +444,8 @@ class Dashboard(DarkPanel):
         self.alt_canvas.draw()
 
         # --- Update status labels ---
-        self.lat_label.text = f"LAT: {lat:.5f}"
-        self.lon_label.text = f"LON: {lon:.5f}"
+        self.lat_label.text = f"LAT: {lat:.6f}"
+        self.lon_label.text = f"LON: {lon:.6f}"
         self.alt_label.text = f"ALT: {alt_val:6.1f} m"
         self.acc_label.text = f"ACC: {acc_val:5.2f} m/s²"
 
@@ -446,3 +472,4 @@ class ESPDashboardApp(App):
 
 if __name__ == "__main__":
     ESPDashboardApp().run()
+

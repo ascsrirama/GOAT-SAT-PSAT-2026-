@@ -41,7 +41,7 @@ class Dashboard(DarkPanel):
         # -----------------------------
         # COLORS / STYLE
         # -----------------------------
-        self.accent = (0.0, 0.8, 0.6, 1)      # teal-ish
+        self.accent = (0.0, 0.8, 0.6, 1)      
         self.accent_soft = (0.2, 0.9, 0.8, 1)
         self.text_main = (0.9, 0.95, 1, 1)
         self.text_dim = (0.6, 0.7, 0.9, 1)
